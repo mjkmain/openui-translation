@@ -3,7 +3,7 @@ from glob import glob
 import json 
 from tqdm import tqdm 
 
-all_data = glob("/home/maverick/openui-trans/data/raw/*/*.json")
+all_data = glob("/home/maverick/openui-translation/data/raw/*/*.json")
 dataset = []
 for data_path in tqdm(all_data):
     with open(data_path, 'r') as f:
@@ -21,5 +21,5 @@ ds = datasets.Dataset.from_list(dataset)
 ds_split = ds.train_test_split(test_size=0.05, seed=42)
 
 ds_split.save_to_disk(
-    "/home/maverick/openui-trans/data/raw/raw_dataset"
+    "/home/maverick/openui-translation/data/raw/raw_dataset"
 )

@@ -47,7 +47,7 @@ def build_dataset(
     
     try:
         ds = datasets.load_from_disk(
-            f"/home/maverick/openui-trans/data/tokenized_v1/{tgt_language.lower()}/{split}",
+            f"/home/maverick/openui-translation/data/tokenized_v1/{tgt_language.lower()}/{split}",
         )
     
 
@@ -60,7 +60,7 @@ def build_dataset(
         )
 
         ds.save_to_disk(
-            f"/home/maverick/openui-trans/data/tokenized_v1/{tgt_language.lower()}/{split}",
+            f"/home/maverick/openui-translation/data/tokenized_v1/{tgt_language.lower()}/{split}",
         )
 
     ds.set_format('torch')

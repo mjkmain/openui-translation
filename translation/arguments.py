@@ -13,7 +13,7 @@ class ModelArguments:
 
 @dataclass
 class DataArguments:
-    law_data_path: Optional[str] = field(default="/home/maverick/openui-trans/data/raw/raw_dataset")
+    law_data_path: Optional[str] = field(default="/home/maverick/openui-translation/data/raw/raw_dataset")
     language: Optional[str] = field(default=None)
 
 @dataclass
