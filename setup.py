@@ -17,7 +17,7 @@ setup(
     ],
         extras_require={ # pip install -e .[evaluation]
         'evaluation': [
-            "rouge", 
+            "rouge",
         ]
     }
 )

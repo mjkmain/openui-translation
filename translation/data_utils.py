@@ -2,7 +2,7 @@ import datasets
 from dataclasses import dataclass
 import transformers
 import torch
-
+PAD_TOKEN_ID = 128011
 def build_dataset(
     low_dataset,
     tokenizer,
@@ -12,8 +12,11 @@ def build_dataset(
     assert tgt_language in ['Vietnamese', 'Indonesian', 'Thai', 'Cambodian']
 
     def tokenize_dataset(examples):
+        text_src = []
+        text_tgt = []
         tokenized_src = []
         tokenized_tgt = []
+        
         
         for korean, target_lang in zip(examples['Korean'], examples[tgt_language]):
             prompt = tokenizer.apply_chat_template(
@@ -29,6 +32,17 @@ def build_dataset(
             
             tokenized_src.append(prompt)
             tokenized_tgt.append(label)
+            if split =="test":
+                text_src.append(korean)
+                text_tgt.append(target_lang)
+            
+        if split == 'test':
+            return{
+                "input_ids": tokenized_src,
+                "labels": tokenized_tgt,
+                "text_src": text_src,
+                "text_tgt": text_tgt,
+            }
         
         all_input_ids = []
         all_labels = []

@@ -3,3 +3,6 @@ saved_models/
 *_env
 *.ipynb
 *.egg*
+*.jsonl
+*.json
+*.pyc
