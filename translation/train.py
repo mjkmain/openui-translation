@@ -2,6 +2,7 @@ import os
 
 import bitsandbytes as bnb
 import torch
+import datasets
 from datasets import concatenate_datasets, load_from_disk
 from torch import nn
 from transformers import (
