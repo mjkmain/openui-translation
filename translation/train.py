@@ -17,6 +17,7 @@ from peft import LoraConfig, PeftModel, TaskType, get_peft_model
 
 from translation.arguments import DataArguments, ModelArguments, MyTrainingArguments
 from translation.data_utils import build_dataset, DataCollatorForSFT
+hf_read_token = os.environ.get("HF_TOKEN")
 
 parser = HfArgumentParser((ModelArguments, DataArguments, MyTrainingArguments))
 model_args, data_args, training_args = parser.parse_args_into_dataclasses()
@@ -26,12 +27,18 @@ print(data_args.language)
 set_seed(training_args.seed)
 
 PAD_TOKEN_ID = 128011
-tokenizer = AutoTokenizer.from_pretrained(model_args.tokenizer_name_or_path)
+tokenizer = AutoTokenizer.from_pretrained(
+    model_args.tokenizer_name_or_path,
+    hf_read_token,
+)
 tokenizer.pad_token_id = PAD_TOKEN_ID
 
 data_collator = DataCollatorForSFT(tokenizer)
 
-raw_ds = load_from_disk(data_args.law_data_path)
+raw_ds = datasets.load_dataset(
+    data_args.law_data_path,
+    token=hf_read_token,
+)
 train_dataset = build_dataset(
     raw_ds,
     tokenizer,
@@ -51,6 +58,7 @@ model = AutoModelForCausalLM.from_pretrained(
     device_map=device_map,
     pad_token_id=PAD_TOKEN_ID,
     attn_implementation="flash_attention_2",
+    token=hf_read_token,
 )
 
 if training_args.peft_path is not None:

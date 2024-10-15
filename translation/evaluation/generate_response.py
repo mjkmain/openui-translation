@@ -8,7 +8,7 @@ from tqdm import tqdm
 import datasets
 
 cwd = os.getcwd()
-hf_read_token = "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"
+hf_read_token = os.environ.get("HF_TOKEN")
 
 class ResponseGenerator:
     def __init__(
