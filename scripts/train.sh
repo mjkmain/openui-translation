@@ -4,7 +4,8 @@ scripts_dir=$(dirname "$scripts")
 base_dir=$(dirname "$scripts_dir")
 
 # languages=("Vietnamese" "Cambodian" "Indonesian" "Thai")
-language=$1
+lang=$1
+echo "Start Training: $lang"
 
 CUDA_VISIBLE_DEVICES="0,1,2,3" torchrun --nnodes 1 --nproc_per_node 4 $base_dir/translation/train.py \
     --output_dir $base_dir/saved_models/llama_$lang \
