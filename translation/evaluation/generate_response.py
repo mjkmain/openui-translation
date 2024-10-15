@@ -8,6 +8,7 @@ from tqdm import tqdm
 import datasets
 
 cwd = os.getcwd()
+hf_read_token = "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"
 
 class ResponseGenerator:
     def __init__(
@@ -58,8 +59,9 @@ class ResponseGenerator:
         gpu_id=0,
         num_gpus=1,
     ):
-        raw_ds = datasets.load_from_disk(
-            "/home/maverick/openui-translation/data/raw/raw_dataset"
+        raw_ds = datasets.load_dataset(
+            "mjkmain/translation_v1",
+            token=hf_read_token,
         )
         
         ds = build_dataset(
@@ -125,7 +127,8 @@ class ResponseGenerator:
             }
             current_time = timer()
             
-            print(f"""\
+            if args.logging:
+                print(f"""\
                 
 ============================================================= Sample number {i+1} ============================================================================
 ## Korean 
@@ -140,14 +143,14 @@ class ResponseGenerator:
 
 """)
 
-            # save_path = os.path.join(
-            #     self.save_dir,
-            #     f"response_{gpu_id}.jsonl"
-            # )
-            # self.write_to_file(
-            #     data=result,
-            #     file_path=save_path,
-            # )
+            save_path = os.path.join(
+                self.save_dir,
+                f"response_{gpu_id}.jsonl"
+            )
+            self.write_to_file(
+                data=result,
+                file_path=save_path,
+            )
             
 def main(args):
     generator = ResponseGenerator(
@@ -171,6 +174,7 @@ if __name__=="__main__":
     parser.add_argument("--target_language", type=str)
     parser.add_argument("--gpu_id", type=int)
     parser.add_argument("--num_gpus", type=int)
+    parser.add_argument("--logging", action="store_true")
     args = parser.parse_args()
     
     main(args)

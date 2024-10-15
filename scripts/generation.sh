@@ -18,5 +18,6 @@ for gpu_id in $(seq 0 $((NUM_GPUS-1))); do
     --tokenizer_name_or_path meta-llama/Meta-Llama-3.1-8B-Instruct \
     --target_language $language\
     --gpu_id $gpu_id \
+    --logging \
     --num_gpus $NUM_GPUS &
 done
