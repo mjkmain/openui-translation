@@ -45,13 +45,19 @@ def main(args):
         predictions.append(d['response'])
         references.append(d['gt'])
     
-    bleu_results = bleu.compute(predictions=predictions, references=references, tokenizer=lambda x: tokenizer.tokenize(x))
+    bleu_results = bleu.compute(
+        predictions=predictions, 
+        references=references, 
+        tokenizer=lambda x: tokenizer.tokenize(x)
+    )
+    
+    
     # bleu_results = bleu.compute(predictions=predictions, references=references, tokenizer=lambda x: x.split(" "))
     # rouge_results = rouge.compute(predictions=predictions, references=references, tokenizer=lambda x: tokenizer.tokenize(x))
     # bertscore_results = bertscore.compute(predictions=predictions, references=references, model_type="bert-base-multilingual-cased")
 
     print(f"#### BLEU SCORE #####")
-    print(f"BLEU :: {math.floor(bleu_results['bleu']*100)}\n")
+    print(f"BLEU :: {math.floor(bleu_results['bleu']*100*100)/100}\n")
     # print("\n#### ROUGE SCORE ####")
     # for k, v in rouge_results.items():
         # print(f"{k} :: {v}")
