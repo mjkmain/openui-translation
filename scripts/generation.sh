@@ -19,5 +19,6 @@ for gpu_id in $(seq 0 $((NUM_GPUS-1))); do
     --target_language $language\
     --gpu_id $gpu_id \
     --logging \
+    --dataset_dir $base_dir/dataset\
     --num_gpus $NUM_GPUS &
 done

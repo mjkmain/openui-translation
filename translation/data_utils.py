@@ -1,3 +1,4 @@
+import os
 import datasets
 from dataclasses import dataclass
 import transformers
@@ -7,6 +8,7 @@ def build_dataset(
     low_dataset,
     tokenizer,
     tgt_language,
+    dataset_dir,
     split="train",
 ):
     assert tgt_language in ['Vietnamese', 'Indonesian', 'Thai', 'Cambodian']
@@ -61,7 +63,10 @@ def build_dataset(
     
     try:
         ds = datasets.load_from_disk(
-            f"/home/maverick/openui-translation/data/tokenized_v1/{tgt_language.lower()}/{split}",
+            os.path.join(
+                dataset_dir, 
+                f"/tokenized_v1/{tgt_language.lower()}/{split}"
+            ),
         )
     
 
@@ -74,7 +79,10 @@ def build_dataset(
         )
 
         ds.save_to_disk(
-            f"/home/maverick/openui-translation/data/tokenized_v1/{tgt_language.lower()}/{split}",
+            os.path.join(
+                dataset_dir, 
+                f"/tokenized_v1/{tgt_language.lower()}/{split}"
+            ),
         )
 
     ds.set_format('torch')

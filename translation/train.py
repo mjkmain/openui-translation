@@ -23,8 +23,6 @@ hf_read_token = os.environ.get("HF_TOKEN")
 parser = HfArgumentParser((ModelArguments, DataArguments, MyTrainingArguments))
 model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-print(data_args.language)
-
 set_seed(training_args.seed)
 
 PAD_TOKEN_ID = 128011
@@ -44,6 +42,7 @@ train_dataset = build_dataset(
     raw_ds,
     tokenizer,
     data_args.language,
+    dataset_dir=data_args.dataset_dir,
     split='train'
 )
 

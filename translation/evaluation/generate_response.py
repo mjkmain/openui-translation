@@ -68,6 +68,7 @@ class ResponseGenerator:
             raw_ds,
             tokenizer=self.tokenizer,
             tgt_language=language,
+            dataset_dir=args.dataset_dir,
             split="test",
         )
         ### Divide dataset for each GPUs
@@ -175,6 +176,7 @@ if __name__=="__main__":
     parser.add_argument("--gpu_id", type=int)
     parser.add_argument("--num_gpus", type=int)
     parser.add_argument("--logging", action="store_true")
+    parser.add_argument("--dataset_dir", type=str)
     args = parser.parse_args()
     
     main(args)

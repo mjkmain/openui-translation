@@ -1,4 +1,7 @@
 #!/bin/bash
+gpu_list="${CUDA_VISIBLE_DEVICES:-0}"
+IFS=',' read -ra GPULIST <<< "$gpu_list" 
+NUM_GPUS=${#GPULIST[@]}
 scripts=$(readlink -f "$0")
 scripts_dir=$(dirname "$scripts")
 base_dir=$(dirname "$scripts_dir")
@@ -7,8 +10,9 @@ base_dir=$(dirname "$scripts_dir")
 lang=$1
 echo "Start Training: $lang"
 
-CUDA_VISIBLE_DEVICES="0,1,2,3" torchrun --nnodes 1 --nproc_per_node 4 $base_dir/translation/train.py \
+CUDA_VISIBLE_DEVICES=$gpu_list torchrun --nnodes 1 --nproc_per_node $NUM_GPUS $base_dir/translation/train.py \
     --output_dir $base_dir/saved_models/llama_$lang \
+    --dataset_dir $base_dir/dataset\
     --language $lang\
     --logging_strategy steps \
     --logging_steps 2 \

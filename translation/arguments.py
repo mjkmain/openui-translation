@@ -15,6 +15,7 @@ class ModelArguments:
 class DataArguments:
     law_data_path: Optional[str] = field(default="mjkmain/translation_v1")
     language: Optional[str] = field(default=None)
+    dataset_dir: Optional[str] = field(default=None)
 
 @dataclass
 class MyTrainingArguments(TrainingArguments):
