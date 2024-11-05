@@ -8,7 +8,7 @@ base_dir=$(dirname "$scripts_dir")
 
 lang="Thai"
 
-model_name="mjkmain/llama3.1-thai"
+model_name="mjkmain/llama3.1-Thai"
 echo "Inference Model: $model_name"
 
 for gpu_id in $(seq 0 $((NUM_GPUS-1))); do

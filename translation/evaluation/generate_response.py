@@ -134,6 +134,7 @@ class ResponseGenerator:
                 references=[eval_data['text_tgt']],
                 tokenizer=lambda x: self.bleu_tokenizer.tokenize(x)
             )
+            score = math.floor(bleu_score['bleu']*100*100)/100
 
             result = {
                 "time": now.strftime('%Y/%m/%d %H:%M:%S'),
@@ -141,7 +142,7 @@ class ResponseGenerator:
                 "korean": eval_data['text_src'],
                 "gt": eval_data['text_tgt'],
                 "response": response,
-                "bleu": math.floor(bleu_score['bleu']*100*100)/100,
+                "bleu": score,
                 "input_prompt": self.tokenizer.decode(eval_data['input_ids'])
             }
             current_time = timer()
@@ -158,6 +159,8 @@ class ResponseGenerator:
 
 ## Predict 
 {response}
+
+## Bleu Score : {score}
 =============================================================== {print_time(current_time)} ===================================================================
 
 """)

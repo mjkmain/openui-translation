@@ -28,7 +28,7 @@ set_seed(training_args.seed)
 PAD_TOKEN_ID = 128011
 tokenizer = AutoTokenizer.from_pretrained(
     model_args.tokenizer_name_or_path,
-    hf_read_token,
+    token=hf_read_token,
 )
 tokenizer.pad_token_id = PAD_TOKEN_ID
 
