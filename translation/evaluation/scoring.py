@@ -3,13 +3,13 @@ import os
 import re
 import argparse
 from evaluate import load
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, logging
 import numpy as np
 import warnings
 import math 
 
 warnings.filterwarnings('ignore')
-
+logging.set_verbosity_error()
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--result_path", type=str)
