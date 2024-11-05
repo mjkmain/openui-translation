@@ -10,7 +10,7 @@ for lang in "${languages[@]}"; do
     echo $lang
     python3 "$base_dir/translation/evaluation/scoring.py" \
         --lang $lang \
-        --result_path "$base_dir/tuning_results/" \
+        --result_path "$base_dir/scripts/results/" \
         --tokenizer_name_or_path google-bert/bert-base-multilingual-cased
     wait
 done

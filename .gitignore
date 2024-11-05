@@ -6,3 +6,8 @@ saved_models/
 *.jsonl
 *.json
 *.pyc
+*.tar
+dataset/
+*.jsonl
+*.json
+*.pyc

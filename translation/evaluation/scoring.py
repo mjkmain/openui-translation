@@ -23,7 +23,7 @@ def main(args):
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name_or_path)
     # Load Evaluator
     bleu = load("bleu")
-    rouge = load("rouge")
+    # rouge = load("rouge")
     # bertscore = load("bertscore")
 
     lang = args.lang

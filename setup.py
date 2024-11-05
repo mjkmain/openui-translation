@@ -6,18 +6,14 @@ setup(
     packages=find_packages(include=['translation', 'translation.*']),
     install_requires=[
         "transformers",
-        "torch",
+        "torch==2.4.0",
         "datasets",
         "peft",
         "bitsandbytes",
         "numpy<2.0.0",
         "ipykernel",
         "ipywidgets",
-        "jsonlines", 
+        "jsonlines",
+        "evaluate"
     ],
-        extras_require={ # pip install -e .[evaluation]
-        'evaluation': [
-            "rouge",
-        ]
-    }
 )

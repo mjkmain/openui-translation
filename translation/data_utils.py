@@ -4,6 +4,9 @@ from dataclasses import dataclass
 import transformers
 import torch
 PAD_TOKEN_ID = 128011
+
+
+
 def build_dataset(
     low_dataset,
     tokenizer,
@@ -14,13 +17,14 @@ def build_dataset(
     assert tgt_language in ['Vietnamese', 'Indonesian', 'Thai', 'Cambodian']
 
     def tokenize_dataset(examples):
+        all_metadata = []
         text_src = []
         text_tgt = []
         tokenized_src = []
         tokenized_tgt = []
         
         
-        for korean, target_lang in zip(examples['Korean'], examples[tgt_language]):
+        for korean, target_lang, meta_data in zip(examples['Korean'], examples[tgt_language], examples['meta_data']):
             prompt = tokenizer.apply_chat_template(
                 conversation=[
                     {"role": "system", "content": f"You are a useful translation AI. Please translate the sentence given in Korean into {tgt_language}."},
@@ -37,6 +41,7 @@ def build_dataset(
             if split =="test":
                 text_src.append(korean)
                 text_tgt.append(target_lang)
+                all_metadata.append(meta_data)
             
         if split == 'test':
             return{
@@ -44,6 +49,7 @@ def build_dataset(
                 "labels": tokenized_tgt,
                 "text_src": text_src,
                 "text_tgt": text_tgt,
+                "meta_data": all_metadata,
             }
         
         all_input_ids = []
@@ -61,17 +67,28 @@ def build_dataset(
             "labels": all_labels,
         }
     
+    def filter_non(examples):
+        arr = []
+        for indonesian in examples[tgt_language]:
+            if indonesian is None:
+                arr.append(False)
+            else:
+                arr.append(True)
+        return arr
+    
+
     try:
         ds = datasets.load_from_disk(
             os.path.join(
                 dataset_dir, 
-                f"/tokenized_v1/{tgt_language.lower()}/{split}"
+                f"{tgt_language.lower()}/{split}"
             ),
         )
     
 
     except:
-        ds = low_dataset[split].map(
+        ds = low_dataset[split].filter(filter_non, batched=True, num_proc=64)
+        ds = ds.map(
             tokenize_dataset,
             batched=True,
             num_proc=48,
@@ -81,7 +98,7 @@ def build_dataset(
         ds.save_to_disk(
             os.path.join(
                 dataset_dir, 
-                f"/tokenized_v1/{tgt_language.lower()}/{split}"
+                f"{tgt_language.lower()}/{split}"
             ),
         )
 

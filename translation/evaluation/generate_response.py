@@ -6,6 +6,7 @@ import torch
 from translation.data_utils import build_dataset, PAD_TOKEN_ID
 from tqdm import tqdm
 import datasets
+from evaluate import load
 
 cwd = os.getcwd()
 hf_read_token = os.environ.get("HF_TOKEN")
@@ -28,6 +29,12 @@ class ResponseGenerator:
             tokenizer_name_or_path,
             token=hf_read_token,
         )
+        self.bleu_tokenizer = AutoTokenizer.from_pretrained(
+            "google-bert/bert-base-multilingual-cased",
+            token=hf_read_token,
+        )
+        self.bleu = load("bleu")
+
         self.tokenizer.pad_token_id = PAD_TOKEN_ID
         
         self.generation_config = {
@@ -43,7 +50,7 @@ class ResponseGenerator:
         }
         
         self.tgt_language = tgt_language
-        self.save_dir = os.path.join(os.getcwd(), "../results", tgt_language)
+        self.save_dir = os.path.join(os.getcwd(), "results", tgt_language)
         os.makedirs(self.save_dir, exist_ok=True)
         
         set_seed(42)
@@ -52,6 +59,7 @@ class ResponseGenerator:
         with open(file_path, 'a') as file:
             json.dump(data, file, ensure_ascii=False)
             file.write('\n')
+    
             
     def load_and_split_dataset(
         self, 
@@ -60,7 +68,7 @@ class ResponseGenerator:
         num_gpus=1,
     ):
         raw_ds = datasets.load_dataset(
-            "mjkmain/translation_v1",
+            args.raw_data_path,
             token=hf_read_token,
         )
         
@@ -89,7 +97,8 @@ class ResponseGenerator:
     ):
         print(f"Start inference {self.tgt_language}.")
         from timeit import default_timer as timer
-        import time
+        from datetime import datetime
+
         start = timer()
 
         def print_time(current_time):
@@ -101,8 +110,8 @@ class ResponseGenerator:
             num_gpus=num_gpus,
         )
 
-        for i, eval_data in enumerate(eval_dataset): #tqdm(eval_dataset, total=len(eval_dataset)):
-
+        for i, eval_data in enumerate(tqdm(eval_dataset, total=len(eval_dataset))): #enumerate(eval_dataset): 
+            now = datetime.now()
             input_ids = eval_data['input_ids'].unsqueeze(0)
 
             if input_ids.size(-1) > self.model.config.max_position_embeddings:
@@ -119,11 +128,20 @@ class ResponseGenerator:
             response = self.tokenizer.decode(
                 output_ids[len(input_ids[0]):], skip_special_tokens=True
             ).strip()
-        
+            
+            bleu_score = self.bleu.compute(
+                predictions=[response],
+                references=[eval_data['text_tgt']],
+                tokenizer=lambda x: self.bleu_tokenizer.tokenize(x)
+            )
+
             result = {
+                "time": now.strftime('%Y/%m/%d %H:%M:%S'),
+                "data_id": eval_data['meta_data']['filename'],
                 "korean": eval_data['text_src'],
                 "gt": eval_data['text_tgt'],
                 "response": response,
+                "bleu": math.floor(bleu_score['bleu']*100*100)/100,
                 "input_prompt": self.tokenizer.decode(eval_data['input_ids'])
             }
             current_time = timer()
@@ -152,7 +170,19 @@ class ResponseGenerator:
                 data=result,
                 file_path=save_path,
             )
+        ###
+        if gpu_id == 0:
+            import glob
+            import jsonlines
+            result_list = sorted(glob.glob(f"{self.save_dir}/*.jsonl"))
+            data = []
+            for path in result_list:
+                with jsonlines.open(path, 'r') as f:
+                    data.extend([x for x in f.iter()])
             
+            with open(f"{self.save_dir}/all_response.json", 'w') as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)
+        
 def main(args):
     generator = ResponseGenerator(
         model_name_or_path=args.model_name_or_path,
@@ -177,6 +207,8 @@ if __name__=="__main__":
     parser.add_argument("--num_gpus", type=int)
     parser.add_argument("--logging", action="store_true")
     parser.add_argument("--dataset_dir", type=str)
+    parser.add_argument("--raw_data_path", type=str)
+
     args = parser.parse_args()
     
     main(args)
