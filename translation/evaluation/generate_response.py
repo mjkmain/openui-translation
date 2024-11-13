@@ -7,6 +7,8 @@ from translation.data_utils import build_dataset, PAD_TOKEN_ID
 from tqdm import tqdm
 import datasets
 from evaluate import load
+import warnings
+warnings.filterwarnings("ignore")
 
 cwd = os.getcwd()
 hf_read_token = os.environ.get("HF_TOKEN")

@@ -23,14 +23,12 @@ def main(args):
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name_or_path)
     # Load Evaluator
     bleu = load("bleu")
-    # rouge = load("rouge")
-    # bertscore = load("bertscore")
 
     lang = args.lang
     result_path = args.result_path
 
     pred_dir = f"{result_path}/{lang}/"
-    pred_files = os.listdir(pred_dir)
+    pred_files = [x for x in os.listdir(pred_dir) if x.endswith("jsonl")]
     
     data = []
     for pred_file in pred_files:
