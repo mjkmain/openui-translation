@@ -8,7 +8,7 @@ PAD_TOKEN_ID = 128011
 
 
 def build_dataset(
-    low_dataset,
+    raw_dataset,
     tokenizer,
     tgt_language,
     dataset_dir,
@@ -87,12 +87,17 @@ def build_dataset(
     
 
     except:
-        ds = low_dataset[split].filter(filter_non, batched=True, num_proc=64)
+        if isinstance(raw_dataset, datasets.DatasetDict):
+            ds = raw_dataset[split]
+        else:
+            ds = raw_dataset
+
+        ds = ds.filter(filter_non, batched=True, num_proc=64)
         ds = ds.map(
             tokenize_dataset,
             batched=True,
             num_proc=48,
-            remove_columns=low_dataset[split].column_names,
+            remove_columns=ds.column_names,
         )
 
         ds.save_to_disk(

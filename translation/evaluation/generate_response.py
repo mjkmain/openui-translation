@@ -11,7 +11,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 cwd = os.getcwd()
-hf_read_token = os.environ.get("HF_TOKEN")
 
 class ResponseGenerator:
     def __init__(
@@ -25,15 +24,13 @@ class ResponseGenerator:
             torch_dtype="auto",
             device_map="auto",
             attn_implementation="flash_attention_2",
-            token=hf_read_token,
         )
         self.tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name_or_path,
-            token=hf_read_token,
         )
         self.bleu_tokenizer = AutoTokenizer.from_pretrained(
             "google-bert/bert-base-multilingual-cased",
-            token=hf_read_token,
+            clean_up_tokenization_spaces=True
         )
         self.bleu = load("bleu")
 
@@ -69,10 +66,14 @@ class ResponseGenerator:
         gpu_id=0,
         num_gpus=1,
     ):
-        raw_ds = datasets.load_dataset(
-            args.raw_data_path,
-            token=hf_read_token,
-        )
+        try:
+            raw_ds = datasets.load_dataset(
+                args.raw_data_path,
+            )
+        except:
+            raw_ds = datasets.load_from_disk(
+                args.raw_data_path,
+            )
         
         ds = build_dataset(
             raw_ds,
